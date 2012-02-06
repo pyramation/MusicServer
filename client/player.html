@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+        <script type="text/javascript" src="js/socket.io.js"></script>
+
+        <script type="text/javascript">
+
+            var current = 'content/test1.mp3';
+
+            function playSong(url) {
+
+                console.log('play url : ' + url);
+
+                current = url;
+                audio.pause();
+                audio.src = url;
+                setTimeout(function(){ audio.play(); }, 0);
+            }
+
+            function stop() {
+                audio.pause();
+            }
+
+            function play() {
+                if (audio.src) audio.play();
+                else {
+                    playSong(current);
+                }
+            }
+
+            window.addEventListener('DOMContentLoaded', function(event) {
+
+                window.audio = document.createElement('audio');
+                document.body.appendChild(audio);
+
+                window.socket = io.connect('http://127.0.0.1:7777');
+                    socket.on('play', function(data) {
+                        playSong(data.url);
+                    });
+
+            });
+        </script>
+
+        <style>
+            button {
+                font-size: 28pt;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <p>
+
+        Eventually, you should have an iTunes interface where you can control everything with node.js and a browser!
+
+        </p>
+
+        <button onclick="play();">
+            &hearts;
+        </button>
+
+        <button onclick="stop();">
+            &bull;
+        </button>
+
+    </body>
+</html>
