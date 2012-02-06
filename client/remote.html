@@ -4,27 +4,42 @@
     <head>
 
         <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
-        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
-        <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-        <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
-
         <script type="text/javascript" src="js/socket.io.js"></script>
         <script type="text/javascript">
+
+            function setClickHandlers() {
+                document.querySelectorAll('a').map(function(a) {
+                    a.addEventListener('click', function(event) {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        data = {};
+                        data.url = a.href;
+                        console.log(data);
+                        socket.emit('play', data);
+                    }, false);
+                });
+            }
 
             window.addEventListener('DOMContentLoaded', function(event) {
                 window.socket = io.connect('http://127.0.0.1:7777');
 
+
+                    socket.emit('list');
+
+                    socket.on('list', function(data) {
+                        console.log(data);
+
+                        var html = '';
+                        for(var i=0; i<data.music.length; i++) {
+                            html += '<li><a href="' + data.music[i] + '" rel="external">' + data.music[i] + '</a></li>';
+                        }
+                        document.getElementById('list').innerHTML = html;
+                        setTimeout(function(){
+                            setClickHandlers();
+                        },0);
+                    }); 
+
                     NodeList.prototype.map = Array.prototype.map;
-                    document.querySelectorAll('a').map(function(a) {
-                        a.addEventListener('click', function(event) {
-                            event.stopPropagation();
-                            event.preventDefault();
-                            data = {};
-                            data.url = a.href;
-                            console.log(data);
-                            socket.emit('play', data);
-                        }, false);
-                    });
 
             });
 
@@ -33,24 +48,9 @@
 
         <body>
 
-            <div data-role="page" id="menu" data-theme="d">
-
-                <div data-role="header">
-                    <h1>JukeBox</h1>
-                </div>
-
-                <div data-role="content">
-                    <ul data-role="listview" data-theme="b">
-                        <li><a href="content/test1.mp3" rel="external">test1 mp3</a></li>
-                        <li><a href="content/test2.mp3" rel="external">test2 mp3</a></li>
-                        <li><a href="content/test3.mp3" rel="external">test3 mp3</a></li>
-                        <li><a href="content/test4.mp3" rel="external">test4 mp3</a></li>
-                    </ul>
-                </div>
-
-                <div data-role="footer">
-                    <h4>Music Player</h4>
-                </div>
+            <div>
+                <ul id="list">
+                </ul>
             </div>
 
         </body>
